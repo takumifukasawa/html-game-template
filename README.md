@@ -1,4 +1,4 @@
-# html-game-template
+# hypercasual-html-game-template
 
 スマホブラウザ向け HTML ゲームのテンプレート（vite + TypeScript）。
 2D は Phaser、3D は Three.js + Rapier または Babylon.js + Havok を想定（ライブラリ選定やエージェント向けの指示は `AGENTS.md`。`CLAUDE.md` はそれを読み込むだけ）。
