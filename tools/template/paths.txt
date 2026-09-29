@@ -1,0 +1,32 @@
+# Ownership map used by tools/template/*.sh.
+#
+# [template]  Template-owned. pull.sh merges these from the template; push.sh
+#             sends commits that touch ONLY these back to the template.
+# [shared]    Owned by both. pull.sh 3-way merges them (conflicts are manual);
+#             push.sh never sends them automatically.
+# Everything else is game-owned: pull.sh drops template-side changes to it.
+#
+# One path per line. A trailing "/" means the whole directory.
+
+[template]
+.node-version
+AGENTS.md
+CLAUDE.md
+docs/TEMPLATE.md
+src/main.ts
+src/style.css
+src/vite-env.d.ts
+src/types/
+src/assets/utilities/
+src/scripts/core/
+src/scripts/utilities/
+tools/capture/capture-video.cjs
+tools/template/
+
+[shared]
+.gitignore
+package.json
+package-lock.json
+index.html
+tsconfig.json
+vite.config.ts
