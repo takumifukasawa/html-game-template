@@ -1,4 +1,4 @@
-# hypercasual-html-game-template
+# html-game-template
 
 スマホブラウザ向け HTML ゲームのテンプレート（vite + TypeScript）。
 エンジンは Phaser（2D）/ Three.js + Rapier / Babylon.js + Havok から `npm run engine` で1つ選ぶ。選ばなかったものはインストールされない。
