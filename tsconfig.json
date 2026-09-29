@@ -1,4 +1,6 @@
 {
+  // What typecheck sees (include/exclude) is generated per engine by `npm run engine`.
+  "extends": "./tsconfig.engine.json",
   "compilerOptions": {
     "target": "ES2022",
     "useDefineForClassFields": true,
@@ -26,6 +28,5 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
-  },
-  "include": ["src"]
+  }
 }

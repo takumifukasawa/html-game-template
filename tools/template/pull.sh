@@ -70,3 +70,7 @@ echo "merged as $(git rev-parse --short HEAD)"
 if git diff --name-only "HEAD^" HEAD | grep -x "package.json" >/dev/null; then
   echo "package.json changed: run \`npm install\` and commit the lockfile"
 fi
+if git diff --name-only "HEAD^" HEAD | grep -x "tools/template/engine.sh" >/dev/null; then
+  cur="$(node -p 'const p = require("./package.json"); (p.config && p.config.engine) || "none"')"
+  echo "tools/template/engine.sh changed: re-run \`npm run engine -- $cur\` to refresh tsconfig.engine.json"
+fi

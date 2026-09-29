@@ -1,1 +1,2 @@
 @AGENTS.md
+@docs/AGENTS_NOTES.md

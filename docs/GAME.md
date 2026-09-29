@@ -27,8 +27,8 @@
 
 ## 7. 実装メモ
 
-- 技術構成: vite + TypeScript + Phaser（2D）。物理は Matter.js。
-- canvas は `src/main.ts` が生成したものを使う（`PhaserApp` に渡す）。
+- 技術構成: vite + TypeScript + <エンジン>（`npm run engine -- <phaser|three|babylon>` で選択。物理は Phaser なら Matter.js、Three.js なら Rapier、Babylon.js なら Havok）。
+- canvas は `src/main.ts` が生成したものを使う（`core/<engine>/` の `PhaserApp` / `ThreeApp` / `BabylonApp` に渡す）。
 - 調整値は `src/scripts/app/GameConfig.ts` に集約。`?demo=1` 用の上書きは `DemoProfile.ts`。
 
 ## 8. 実装初期値（暫定・触って調整する）

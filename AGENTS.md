@@ -1,9 +1,15 @@
 # AGENTS
 
 AI コーディングエージェント（Claude Code, Codex など）向けのプロジェクト指示。エージェントの種類に依存しない内容をここに置く。
-`CLAUDE.md` はこのファイルを読み込むだけの薄いファイル（`@AGENTS.md`）にし、指示の正はここ1箇所にする。
 
-このファイルはエージェントが編集してはいけない。
+指示は2ファイルに分かれている。エージェントは起動時に両方読む。
+
+| ファイル | 内容 | エージェントの編集 |
+|---|---|---|
+| `AGENTS.md`（このファイル） | 人が決めるルール。ライブラリ選定、編集してよい範囲、計測、仕様の扱い | **不可**。ユーザーから明示的に頼まれた時だけ編集する。変えたいことがあれば `docs/AGENTS_NOTES.md` の質問リストに書く |
+| `docs/AGENTS_NOTES.md` | 開発しながら育つ補足。現状、慣習、ハマりどころ、エージェントからの質問 | **可**。ただしこのファイルのルールと矛盾する内容は書かない |
+
+`CLAUDE.md` はこの2ファイルを読み込むだけの薄いファイル（`@AGENTS.md` / `@docs/AGENTS_NOTES.md`）にし、指示の本文は書かない。
 
 ## 選定ライブラリ
 
@@ -46,6 +52,7 @@ AI コーディングエージェント（Claude Code, Codex など）向けの�
 - 外部ライブラリは npm install でインストールする
     - 外部ライブラリも含めてjsにbundleするため
     - CDNも使わない
+- ゲームエンジン（Phaser / Three.js + Rapier / Babylon.js + Havok）は package.json に最初から入っていない。`npm run engine -- <phaser|three|babylon>` で1つ選んで入れる（選ばなかったエンジンは入れない）。手順は /docs/TEMPLATE.md
 
 ### 対象端末
 
@@ -62,12 +69,15 @@ AI コーディングエージェント（Claude Code, Codex など）向けの�
 - アプリケーションのルートファイルは /src/scripts/app/App.ts
     - class 想定。main.ts で new して使う
 - /src/scripts/core … テンプレート共通実装（エージェント編集可。ゲーム固有の名前・値・色は入れない）
+- /src/scripts/core/<engine> … エンジン別の共通実装（phaser / three / babylon）。選択中のエンジン分だけ typecheck される
 - /src/scripts/app … ゲーム本体（エージェント編集可）
 - 数値や色など、調整用の項目は可能な限り別ファイル（/src/scripts/app/GameConfig.ts など）として切り出す
 
-- エージェントが編集してはならない typescript
+- エージェントが編集してはならないファイル
     - /src/main.ts
     - /src/scripts/utilities/*.*
+    - /AGENTS.md（このファイル）
+    - /tsconfig.engine.json（npm run engine が生成する）
 
 ### テンプレート運用
 
@@ -85,7 +95,7 @@ AI コーディングエージェント（Claude Code, Codex など）向けの�
 
 start, update は src/main.ts で呼ぶ。startLevel, endLevel は App などで実装する。
 
-※ 現在このリポジトリに systemService は含まれていない。必要になった時に /src/scripts/utilities 以下へ追加する。
+systemService が導入済みかどうかは /docs/AGENTS_NOTES.md の「現状」を見る。
 
 ## 仕様
 
@@ -97,21 +107,14 @@ start, update は src/main.ts で呼ぶ。startLevel, endLevel は App などで
 
 ## エージェントからの質問
 
-仕様を更新する際、「エージェントからの質問 / ユーザーからの答え」を使ってエージェントからの仕様への質問を受けつける。
+エージェントに疑問があった場合、該当する markdown の「エージェントからの質問リスト」に以下のフォーマットで質問を追加し、ユーザーの回答を待つ。
 
-### エージェントからの質問 / ユーザーからの答え
+- 仕様（ゲームの挙動など）への質問 … その仕様の markdown（/docs/GAME.md など）
+- このファイルのルールやテンプレート全体への質問 … /docs/AGENTS_NOTES.md
 
-エージェントからの疑問があった場合、以下のルールに則って仕様の markdown を編集可能。
-
-- 「エージェントからの質問リスト」を追加
-- 以下のフォーマットに従い、質問内容を追加する
-- ユーザーの回答を待つ
+リストが無ければ「## エージェントからの質問リスト」を末尾に追加してよい。
 
 ```
 - Q. [エージェント質問欄]
   - [ユーザー回答欄]
 ```
-
-### エージェントからの質問リスト
-
-以下に記載。

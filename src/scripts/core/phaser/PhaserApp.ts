@@ -1,16 +1,12 @@
 import Phaser from "phaser";
+import {playSize, prepareCanvas} from "@/src/scripts/core/viewport.ts";
 
 export type PhaserAppOptions = {
     /** The canvas created by src/main.ts. Phaser renders into it and never creates its own. */
     canvas: HTMLCanvasElement;
     /** Internal render size = CSS size * ratio, so the game stays crisp on high-DPI screens. */
     ratio: number;
-    /**
-     * Max play-field aspect ratio (width / height). Wider viewports (desktop,
-     * landscape) are letterboxed to a centered portrait column so the layout
-     * and difficulty stay consistent. Narrower viewports use the full width.
-     * 0 = no cap.
-     */
+    /** Max play-field aspect ratio (width / height); wider viewports are letterboxed. 0 = no cap. See core/viewport.ts. */
     maxAspect?: number;
     /** Renderer. A custom canvas needs an explicit one (Phaser.AUTO is rejected). Default "webgl". */
     renderer?: "webgl" | "canvas";
@@ -41,13 +37,9 @@ export class PhaserApp {
         this.ratio = options.ratio;
         this.maxAspect = options.maxAspect ?? 0;
 
-        // Kill the mobile browser's tap delay / gesture handling so pointerdown
-        // fires immediately (no ~300ms wait, no double-tap zoom / scroll steal).
-        this.canvas.style.touchAction = "none";
-        (this.canvas.style as unknown as Record<string, string>).webkitTapHighlightColor = "transparent";
-        this.canvas.style.userSelect = "none";
+        prepareCanvas(this.canvas);
 
-        const {pw, ph} = PhaserApp.playSize(window.innerWidth, window.innerHeight, this.maxAspect);
+        const {pw, ph} = playSize(window.innerWidth, window.innerHeight, this.maxAspect);
         this.canvas.style.width = `${pw}px`;
         this.canvas.style.height = `${ph}px`;
 
@@ -83,21 +75,11 @@ export class PhaserApp {
     }
 
     private applySize(width: number, height: number): void {
-        const {pw, ph} = PhaserApp.playSize(width, height, this.maxAspect);
+        const {pw, ph} = playSize(width, height, this.maxAspect);
         this.game.scale.resize(Math.max(1, Math.floor(pw * this.ratio)), Math.max(1, Math.floor(ph * this.ratio)));
         this.canvas.style.width = `${pw}px`;
         this.canvas.style.height = `${ph}px`;
         // Make sure pointer coordinates map to the CSS-scaled canvas.
         this.game.scale.refresh();
-    }
-
-    /** Clamp a viewport (CSS px) to the max play-field aspect ratio. */
-    static playSize(cssW: number, cssH: number, maxAspect: number): {pw: number; ph: number} {
-        let pw = cssW;
-        const ph = cssH;
-        if (maxAspect > 0 && pw / ph > maxAspect) {
-            pw = Math.round(ph * maxAspect);
-        }
-        return {pw, ph};
     }
 }
