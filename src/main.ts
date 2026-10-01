@@ -6,8 +6,8 @@ const wrapperElement = document.getElementById("wrapper")!;
 const canvasElement = document.createElement("canvas") as HTMLCanvasElement;
 wrapperElement.appendChild(canvasElement);
 
-// const ratio = Math.max(1.5, window.devicePixelRatio);
-const ratio = 1.5;
+// Capped at 1.5, and never above the device's own ratio (a 1x screen does not draw 1.5x).
+const ratio = Math.min(1.5, window.devicePixelRatio || 1);
 
 const app = new App({canvas: canvasElement, ratio});
 
