@@ -5,7 +5,7 @@ import {CopyShader} from "three/examples/jsm/shaders/CopyShader.js";
 
 /**
  * Makes three.js's UnrealBloomPass temporally stable, so thin or small bright
- * things (lines, rings, star points) do not shimmer as they move.
+ * things (thin lines, small points) do not shimmer as they move.
  *
  * Why it shimmers: the pass extracts the bright areas with a single texture tap
  * from the full-resolution scene into a half-size buffer (half of the size the
@@ -14,8 +14,9 @@ import {CopyShader} from "three/examples/jsm/shaders/CopyShader.js";
  * level amplifies it. Its default threshold knee (0.01) is a hard cut on top.
  *
  * What this does (the rest of the pass is untouched):
- * 1. Bright pass = a filtered downsample: a 4x4 block (4 bilinear taps + the
- *    center), each tap weighted down by its brightness (Karis average, so one
+ * 1. Bright pass = a filtered downsample: a 4x4 block of the source (4
+ *    bilinear taps + the center; exactly 4x4 when the pass is given the full
+ *    buffer size, so its bright buffer is half of it), each tap weighted down by its brightness (Karis average, so one
  *    hot pixel does not dominate), then the threshold with a soft knee.
  * 2. Temporal smoothing: the composited bloom is mixed with last frame's.
  *    Bloom is soft and wide, so the short lag does not show on moving lights;
@@ -23,7 +24,7 @@ import {CopyShader} from "three/examples/jsm/shaders/CopyShader.js";
  *
  * Usage, with an EffectComposer that contains the pass:
  *   const stable = new StableBloom(bloomPass);
- *   stable.setSourceSize(width * pixelRatio, height * pixelRatio); // on resize
+ *   stable.setSourceSize(width * pixelRatio, height * pixelRatio); // once, then on every resize
  *   stable.beforeRender();                                         // each frame
  *   composer.render();
  *   stable.afterRender(renderer);
@@ -45,11 +46,10 @@ export class StableBloom {
 
     constructor(bloom: UnrealBloomPass) {
         this.bloom = bloom;
-        const internals = bloom as unknown as {materialHighPassFilter: THREE.ShaderMaterial; compositeMaterial: THREE.ShaderMaterial};
         const u = this.highPass();
         u.uSrcTexel = {value: new THREE.Vector2(1 / 1024, 1 / 1024)};
         u.smoothWidth.value = 0.3;
-        const m = internals.materialHighPassFilter;
+        const m = bloom.materialHighPassFilter;
         m.fragmentShader = /* glsl */ `
 uniform sampler2D tDiffuse;
 uniform vec3 defaultColor;
@@ -75,13 +75,19 @@ void main() {
 }
 `;
         m.needsUpdate = true;
-        const c = internals.compositeMaterial;
+        const c = bloom.compositeMaterial;
         c.uniforms.tBloomHistory = {value: this.history.texture};
         c.uniforms.uHistoryMix = {value: 0};
+        // Patches the pass's own composite shader: if a three.js update changes
+        // these lines, say so instead of silently losing the smoothing.
+        const declare = "uniform float bloomStrength;";
+        const output = "gl_FragColor = vec4( bloom, bloomAlpha );";
+        if (!c.fragmentShader.includes(declare) || !c.fragmentShader.includes(output)) {
+            console.warn("StableBloom: UnrealBloomPass composite shader changed; temporal smoothing is off.");
+        }
         c.fragmentShader = c.fragmentShader
-            .replace("uniform float bloomStrength;", "uniform float bloomStrength;\nuniform sampler2D tBloomHistory;\nuniform float uHistoryMix;")
-            .replace("gl_FragColor = vec4( bloom, bloomAlpha );",
-                "vec4 cur = vec4( bloom, bloomAlpha );\ngl_FragColor = mix( cur, texture2D( tBloomHistory, vUv ), uHistoryMix );");
+            .replace(declare, `${declare}\nuniform sampler2D tBloomHistory;\nuniform float uHistoryMix;`)
+            .replace(output, "vec4 cur = vec4( bloom, bloomAlpha );\ngl_FragColor = mix( cur, texture2D( tBloomHistory, vUv ), uHistoryMix );");
         c.needsUpdate = true;
     }
 
@@ -90,7 +96,7 @@ void main() {
         this.highPass().smoothWidth.value = value;
     }
 
-    /** The scene buffer size in pixels (CSS size * pixel ratio). Call on resize. */
+    /** The scene buffer size in pixels (CSS size * pixel ratio). Call once after creating, then on every resize. */
     setSourceSize(width: number, height: number): void {
         (this.highPass().uSrcTexel.value as THREE.Vector2).set(1 / Math.max(1, width), 1 / Math.max(1, height));
     }
@@ -100,14 +106,14 @@ void main() {
         const now = performance.now();
         const dt = this.last > 0 ? Math.min(0.1, (now - this.last) / 1000) : 1;
         this.last = now;
-        const u = (this.bloom as unknown as {compositeMaterial: THREE.ShaderMaterial}).compositeMaterial.uniforms;
+        const u = this.bloom.compositeMaterial.uniforms;
         u.tBloomHistory.value = this.history.texture;
         u.uHistoryMix.value = Math.pow(THREE.MathUtils.clamp(this.temporalMix, 0, 0.95), dt * 60);
     }
 
     /** Each frame, after composer.render(): keep this frame's bloom for the next one. */
     afterRender(renderer: THREE.WebGLRenderer): void {
-        const target = (this.bloom as unknown as {renderTargetsHorizontal: THREE.WebGLRenderTarget[]}).renderTargetsHorizontal[0];
+        const target = this.bloom.renderTargetsHorizontal[0];
         if (this.history.width !== target.width || this.history.height !== target.height) {
             this.history.setSize(target.width, target.height);
         }
