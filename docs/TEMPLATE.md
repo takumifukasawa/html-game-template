@@ -31,12 +31,14 @@
     - `query.ts` … URL クエリ（`hasQueryFlag("demo")` など）
     - `globalTap.ts` … canvas 外（レターボックスの黒帯）のタップ拾い
     - `fonts.ts` … Web フォント読込待ち
+    - `debug/TuningPanel.ts` … 開発用の調整パネル（Tweakpane）。下の「調整パネル」
 - `src/scripts/utilities/` … 汎用ユーティリティ（logger, TimeAccumulator, FingerTapIndicator, babylon/ …）。AGENTS.md によりエージェント編集禁止。
 - `src/scripts/app/` … **ゲーム本体**。テンプレートにはエンジンなしのプレースホルダだけが入っている。`npm run engine -- <engine>` でそのエンジンのスターター（`tools/template/starters/<engine>/`）に置き換わる。ゲームごとに書き換える。
 - `tools/capture/` … 実プレイ録画ツール。`capture-video.cjs` は汎用、`autopilot.cjs` はゲームごとの自動操作フック（スターターに付属。ゲーム領域）。
+- `tools/tuning/` … 調整パネルの保存を受ける Vite プラグイン（`vite.config.ts` で登録）。
 - `tools/template/` … 本ガイドの同期スクリプト、`engine.sh`（エンジン選択）、`starters/<engine>/`（エンジン別サンプル。リポジトリのルート構成をミラーし、`src/scripts/app/` と `tools/capture/autopilot.cjs` を持つ）。
 - `docs/GAME.md` … ゲーム仕様。テンプレートには雛形のみ。
-- `docs/AGENTS_NOTES.md` … エージェント向けの補足メモ（現状・慣習・ハマりどころ・質問）。エージェント編集可。テンプレートには雛形のみ。ルール本体は `AGENTS.md`（エージェント編集不可）。
+- `docs/AGENTS_NOTES.md` … エージェント向けの補足メモ（慣習・質問。現在地は `docs/handoff.md`、罠は `docs/learnings.md`）。エージェント編集可。テンプレートには雛形のみ。ルール本体は `AGENTS.md`（エージェント編集不可）。
 - `tsconfig.engine.json` … `npm run engine` が生成する。typecheck の include / exclude だけを持つ（`tsconfig.json` が extends する）。手で編集しない。
 
 ## 新しいゲームを作る
@@ -80,6 +82,17 @@ npm run engine -- all               # テンプレート保守用: 全エンジ�
 スターターはどれも「箱（ボール）が落ちる。タップで跳ねる」だけの最小構成で、`PhaserApp` / `ThreeApp` / `BabylonApp` の使い方、非同期の物理初期化（Rapier / Havok）、`GameConfig` と `?demo=1`、capture 用の `window.__game` を示す。
 
 `tsconfig.engine.json` はゲーム領域（テンプレートから流れてこない）。`npm run template:pull` で `engine.sh` が更新されたら、同じエンジンで `npm run engine -- <engine>` を再実行して生成し直す（pull.sh が案内を出す）。
+
+## 調整パネル（開発用）
+
+`GameConfig` をブラウザ上で調整し、`GameConfig.ts` に書き戻す（決定: `docs/decisions/0002-tuning-panel.md`）。
+
+- 開発サーバーで `?debug` を付けて開くと右上にパネルが出る。数値・文字列・真偽値・色が自動でコントロールになる。
+- 変えた値はその場で効く（設定オブジェクトを直接書き換える）。作る時だけ読む値は、ゲーム側の `onChange` でシーンを作り直す。
+- 「Save」で変えた値だけを `GameConfig.ts` に書き戻す（コメント・型は残る。リロードしない）。「Save & reload」「Discard (reload)」「Copy unsaved as JSON」もある。
+- 本番ビルドには入らない（`import.meta.env.DEV` で囲んだ動的 import からだけ読む）。
+- 起動時にしか効かない値（描画解像度など）は `reloadOn` に渡す。その値を変えると、未保存の変更を保存してからリロードする。URL クエリで上書きしている値は、起動時に設定オブジェクトへ反映しておくと、パネルに実際の値が出る。
+- ゲームへの組み込みは `App.ts` で `mountTuningPanel({config, file, hints, include, onChange})` を呼ぶ。書き込めるファイルは `vite.config.ts` の `tuningPlugin({files})` に登録したものだけ。選択肢を出したい文字列は `hints` に `{options: {...}}` を渡す。
 
 ## テンプレートの更新を取り込む（template → game）
 

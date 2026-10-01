@@ -23,6 +23,7 @@ src/scripts/core/
 src/scripts/utilities/
 tools/capture/capture-video.cjs
 tools/template/
+tools/tuning/
 
 [shared]
 .gitignore
