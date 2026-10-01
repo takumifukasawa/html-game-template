@@ -3,13 +3,17 @@
 このリポジトリはスマホブラウザ向け HTML ゲームのテンプレート（vite + TypeScript）。エンジンは Phaser（2D）/ Three.js + Rapier / Babylon.js + Havok から `npm run engine` で1つ選ぶ。選ばなかったエンジンはインストールされない。
 新しいゲームはここを clone して作り、**別リポジトリ**にコミットする。ゲーム側で行ったテンプレート領域の改善は、テンプレートへ書き戻せる。
 
+## ゲームに依存しない知見
+
+`docs/knowledge/` に、どのゲームでも効く技術的な知見と落とし穴を置く（索引: `docs/knowledge/README.md`）。ゲーム固有の名前・値・素材は書かない。ゲームで得た知見は、ゲームから切り離した形でここへ書き戻す。
+
 ## 領域の区分
 
 どのパスが誰のものかは `tools/template/paths.txt` が正。スクリプトはこのファイルだけを見る。
 
 | 区分 | 主なパス | 取り込み（template → game） | 書き戻し（game → template） |
 |---|---|---|---|
-| **template** | `src/main.ts`, `src/scripts/core/`, `src/scripts/utilities/`, `tools/capture/capture-video.cjs`, `tools/template/`, `AGENTS.md`, `CLAUDE.md`, `docs/TEMPLATE.md` | merge される | この領域**だけ**を触ったコミットを自動で送れる |
+| **template** | `src/main.ts`, `src/scripts/core/`, `src/scripts/utilities/`, `tools/capture/capture-video.cjs`, `tools/template/`, `AGENTS.md`, `CLAUDE.md`, `docs/TEMPLATE.md`, `docs/knowledge/` | merge される | この領域**だけ**を触ったコミットを自動で送れる |
 | **shared** | `package.json`, `package-lock.json`, `index.html`, `vite.config.ts`, `tsconfig.json`, `.gitignore` | 3-way merge（衝突は手で解決） | 自動では送らない（手で cherry-pick） |
 | **game**（それ以外） | `src/scripts/app/`, `tools/capture/autopilot.cjs`, `tsconfig.engine.json`, `docs/GAME.md`, `docs/AGENTS_NOTES.md`, `public/`, `README.md` | テンプレート側の変更は**捨てる** | 送らない |
 
