@@ -61,6 +61,12 @@ export function mountTuningPanel(options: TuningPanelOptions): {dispose: () => v
         zIndex: "1000",
     });
     document.body.appendChild(container);
+    // Phaser also listens on window and hit-tests presses that start outside the canvas, so a tap on the
+    // panel would press the game button under it too. Stop presses at the panel (only the start events:
+    // the panel's own drags listen for move / up on the document).
+    for (const type of ["pointerdown", "mousedown", "touchstart"]) {
+        container.addEventListener(type, (e) => e.stopPropagation());
+    }
 
     const pane = new Pane({container, title, expanded: options.expanded ?? false});
     const dirty = new Map<string, {path: TuningPath; value: Leaf}>();
