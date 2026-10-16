@@ -4,7 +4,7 @@ import {Pane} from "tweakpane";
 /**
  * Dev-only tuning panel (Tweakpane) over a live config object, with save back
  * into the config's source file through tools/tuning/vite-plugin-tuning.ts.
- * Engine-agnostic; template-owned (docs/decisions/0002-tuning-panel.md).
+ * Engine-agnostic; template-owned (docs/TEMPLATE.md).
  *
  * Load it ONLY behind `import.meta.env.DEV` with a dynamic import, so neither
  * this file nor Tweakpane reaches the production bundle:

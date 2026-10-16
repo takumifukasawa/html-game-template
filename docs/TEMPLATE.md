@@ -85,7 +85,7 @@ npm run engine -- all               # テンプレート保守用: 全エンジ�
 
 ## 調整パネル（開発用）
 
-`GameConfig` をブラウザ上で調整し、`GameConfig.ts` に書き戻す（決定: `docs/decisions/0002-tuning-panel.md`）。
+`GameConfig` をブラウザ上で調整し、`GameConfig.ts` に書き戻す。
 
 - 開発サーバーで `?debug` を付けて開くと右上にパネルが出る。数値・文字列・真偽値・色が自動でコントロールになる。
 - 変えた値はその場で効く（設定オブジェクトを直接書き換える）。作る時だけ読む値は、ゲーム側の `onChange` でシーンを作り直す。

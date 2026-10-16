@@ -1,7 +1,7 @@
 /**
  * Dev-server endpoint that writes tuning-panel changes back into a config
  * source file (e.g. src/scripts/app/GameConfig.ts), so the file stays the
- * single place values live (docs/decisions/0002-tuning-panel.md).
+ * single place values live (docs/TEMPLATE.md).
  *
  *   POST /__tuning/save  {"file": "<relative path>", "changes": [{"path": ["a", 0, "b"], "value": 1}]}
  *
