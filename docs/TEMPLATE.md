@@ -38,7 +38,7 @@
 - `tools/tuning/` … 調整パネルの保存を受ける Vite プラグイン（`vite.config.ts` で登録）。
 - `tools/template/` … 本ガイドの同期スクリプト、`engine.sh`（エンジン選択）、`starters/<engine>/`（エンジン別サンプル。リポジトリのルート構成をミラーし、`src/scripts/app/` と `tools/capture/autopilot.cjs` を持つ）。
 - `docs/GAME.md` … ゲーム仕様。テンプレートには雛形のみ。
-- `docs/AGENTS_NOTES.md` … エージェント向けの補足メモ（慣習・質問。現在地は `docs/handoff.md`、罠は `docs/learnings.md`）。エージェント編集可。テンプレートには雛形のみ。ルール本体は `AGENTS.md`（エージェント編集不可）。
+- `docs/AGENTS_NOTES.md` … エージェント向けの補足メモ（現状・慣習・ハマりどころ・質問）。エージェント編集可。テンプレートには雛形のみ。ルール本体は `AGENTS.md`（エージェント編集不可）。
 - `tsconfig.engine.json` … `npm run engine` が生成する。typecheck の include / exclude だけを持つ（`tsconfig.json` が extends する）。手で編集しない。
 
 ## 新しいゲームを作る
