@@ -1,0 +1,26 @@
+{
+  "name": "html-game-template",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "python -m http.server 9000 --directory dist",
+    "typecheck": "tsc --noEmit",
+    "capture": "node tools/capture/capture-video.cjs",
+    "template:new": "bash tools/template/new-game.sh",
+    "template:pull": "bash tools/template/pull.sh",
+    "template:list": "bash tools/template/list.sh",
+    "template:push": "bash tools/template/push.sh",
+    "engine": "bash tools/template/engine.sh"
+  },
+  "devDependencies": {
+    "typescript": "~5.8.3",
+    "vite": "^7.1.2"
+  },
+  "config": {
+    "engine": "none"
+  }
+}
