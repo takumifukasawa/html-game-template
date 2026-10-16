@@ -10,6 +10,7 @@
 - 選択中のエンジンは `npm run engine`（引数なし）で確認する（package.json の `config.engine`）。テンプレートの初期状態は none。
 - agent-harness はこのリポジトリに未導入（`.harness/`, `.agents/`, `docs/handoff.md` などは無い）。それでも `AGENTS.md` 冒頭の harness ブロックは存在しないファイルを指している（2026-10-16 時点。下の質問リスト参照）。現状はこの「現状」節を正とする。
 - 2026-10-16 に公開前の漏洩監査（作業ツリー + 全履歴）を実施し、問題なし。その後 `sync/tuning-panel`（tuning panel など 3 コミット）を main に fast-forward して push 済み。
+- 2026-10-16 に計測（systemService / startLevel / endLevel / engagement）の記述とコードを全履歴から削除（filter-branch で全コミットを書き換え）し、GitHub のリポジトリを削除・再作成して push し直した。計測はテンプレートの範囲外。書き換え前に clone したリポジトリは古い履歴を持つ。
 
 ## 慣習
 
